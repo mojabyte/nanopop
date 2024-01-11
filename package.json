@@ -29,7 +29,7 @@
         "serve": "vite preview --port 3005 --outDir .",
         "lint": "eslint ./{src,tests}/**/*.ts",
         "lint:fix": "npm run lint -- --fix",
-        "test": "playwright test",
+        "test": "playwright test --ui",
         "test:ci": "npm run lint:fix && npm run build && npm test"
     },
     "homepage": "https://github.com/Simonwep/nanopop#readme",

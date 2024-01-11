@@ -85,6 +85,41 @@ export const defaults = {
     padding: 0
 };
 
+function getScale(element: HTMLElement) {
+    const rect = element.getBoundingClientRect();
+
+    let x = Math.round(rect.width) / element.offsetWidth;
+    let y = Math.round(rect.height) / element.offsetHeight;
+
+    if (!x || !Number.isFinite(x)) {
+        x = 1;
+    }
+
+    if (!y || !Number.isFinite(y)) {
+        y = 1;
+    }
+
+    return { x, y };
+}
+
+function isScaled(element: HTMLElement) {
+    const scale = getScale(element);
+
+    return scale.x !== 1 || scale.y !== 1;
+}
+
+function getBoundingClientRect(element: HTMLElement): DOMRect {
+    const rect = element.getBoundingClientRect();
+    const scale = getScale(element);
+
+    return new DOMRect(
+        Math.round(rect.left / scale.x),
+        Math.round(rect.top / scale.x),
+        Math.round(rect.width / scale.x),
+        Math.round(rect.height / scale.y)
+    );
+}
+
 /**
  * Repositions an element once using the provided options and elements.
  * @param reference Reference element
@@ -118,8 +153,10 @@ export const reposition = (
     popper.style.left = '0';
     popper.style.top = '0';
 
-    const refBox = reference.getBoundingClientRect();
-    const popBox = popper.getBoundingClientRect();
+    const popBox = getBoundingClientRect(popper);
+    const refBox = isScaled(popper)
+        ? getBoundingClientRect(reference)
+        : reference.getBoundingClientRect();
 
     /**
      * Holds coordinates of top, left, bottom and right alignment
